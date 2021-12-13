@@ -1,10 +1,11 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var session = require('express-session')
+var FileStore = require('session-file-store')(session);
 var path = require('path');
 const util = require('util');
 var speakeasy = require('speakeasy')
 var fs = require("fs");
-
 
 var app = express();
 const port = 3000
@@ -12,6 +13,15 @@ const port = 3000
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+    name: 'session-id',
+    secret: '12345-67890-09876-54321',
+    saveUninitialized: false,
+    resave: false,
+    store: new FileStore()
+}));
+
 
 //app logic and data
 var users = getFakeDB('fakeDB.json');
@@ -22,6 +32,7 @@ let counter = 0;
 //U16554575997295564327
 
 app.get('/', function(req, res) {
+    console.log(res.session)
     res.sendFile(__dirname + '/public/registration.html');
 });
 app.get('/verification', function(req, res) { //auth 2FA verification
@@ -30,7 +41,7 @@ app.get('/verification', function(req, res) { //auth 2FA verification
 app.get('/verify', function(req, res) { //registration adamant account verification
     res.sendFile(__dirname + '/public/verifyAdamant.html');
 });
-app.get('/home', function(req, res) {
+app.get('/home', isAuthenticated, function(req, res) {
     res.sendFile(__dirname + '/public/welcomePage.html');
 })
 
@@ -54,6 +65,11 @@ app.post('/login', (req, res) => {
         res.json({ success: false, status: 'Login Unsuccessful!' });
     }
 })
+app.post('/register', (req, res) => {
+    users[req.body.email] = { address: req.body.address, password: req.body.password }
+    setFakeDB('fakeDB.json', users);
+    res.redirect('/verify');
+})
 app.post('/verification', (req, res) => {
     const verified = speakeasy.hotp.verify({
         token: req.body.code,
@@ -70,11 +86,7 @@ app.post('/verification', (req, res) => {
         res.json({ success: false, status: 'verification failed, login Unsuccessful!' });
     }
 });
-app.post('/register', (req, res) => {
-    users[req.body.email] = { address: req.body.address, password: req.body.password }
-    setFakeDB('fakeDB.json', users);
-    res.redirect('/verify');
-})
+
 app.post('/verify', (req, res) => { //for registration adamant address verification
     if (req.body.code) {
         res.statusCode = 200;
@@ -103,7 +115,14 @@ app.listen(port, () => {
 
 
 function isAuthenticated(req, res, next) {
-    return true;
+    // if (req.session.user === null) {     
+    //     var err = new Error('Not authorized! Go back!');
+    //     err.status = 401;
+    //     return next(err);
+    // } else 
+    {
+        return next();
+    }
 }
 
 async function sendWithAdamant(adamantAddress, code) {
