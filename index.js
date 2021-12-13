@@ -17,18 +17,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 var users = getFakeDB('fakeDB.json');
 let counter = 0;
 
-
+//my adamant account
 //spatial address online situate consider slight powder network spoil moon ridge dutch
 //U16554575997295564327
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/public/registration.html');
-    setFakeDB('fakeDB.json', users)
 });
-app.get('/verification', function(req, res) {
+app.get('/verification', function(req, res) { //auth 2FA verification
     res.sendFile(__dirname + '/public/authCode.html');
 });
-app.get('/verify', function(req, res) {
+app.get('/verify', function(req, res) { //registration adamant account verification
     res.sendFile(__dirname + '/public/verifyAdamant.html');
 });
 app.get('/home', function(req, res) {
@@ -36,33 +35,39 @@ app.get('/home', function(req, res) {
 })
 
 app.post('/login', (req, res) => {
-    if (req.body.email && users[req.body.email] && users[req.body.email].password == req.body.password) {
+    if (req.body.email && users[req.body.email] && users[req.body.email].password &&
+        users[req.body.email].password == req.body.password) {
+
         //setting the one time code
+        users[req.body.email]['counter'] = counter++;
         users[req.body.email]['code'] = speakeasy.hotp({
-            counter,
+            counter: users[req.body.email]['counter'],
             secret: users[req.body.email].password,
         });
         sendWithAdamant(users[req.body.adamantAddress], users[req.body.email]['code'])
-        counter++;
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/verification')
+    } else {
+        res.statusCode = 401;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({ success: false, status: 'Login Unsuccessful!' });
     }
-
-    res.statusCode = 401;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({ success: false, status: 'Login Unsuccessful!' });
 })
 app.post('/verification', (req, res) => {
     const verified = speakeasy.hotp.verify({
         token: req.body.code,
         secret: users[req.body.email].code,
-        counter: counter
+        counter: users[req.body.email].counter,
     })
     if (verified) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/home')
+    } else {
+        res.statusCode = 401;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({ success: false, status: 'verification failed, login Unsuccessful!' });
     }
 });
 app.post('/register', (req, res) => {
@@ -70,7 +75,7 @@ app.post('/register', (req, res) => {
     setFakeDB('fakeDB.json', users);
     res.redirect('/verify');
 })
-app.post('/verify', (req, res) => { //for registration address verification
+app.post('/verify', (req, res) => { //for registration adamant address verification
     if (req.body.code) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
