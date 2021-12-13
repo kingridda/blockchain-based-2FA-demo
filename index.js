@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var path = require('path');
 const util = require('util');
 var speakeasy = require('speakeasy')
+var fs = require("fs");
+
 
 var app = express();
 const port = 3000
@@ -12,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //app logic and data
-var users = {};
+var users = getFakeDB('fakeDB.json');
 let counter = 0;
 
 
@@ -21,6 +23,7 @@ let counter = 0;
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/public/registration.html');
+    setFakeDB('fakeDB.json', users)
 });
 app.get('/verification', function(req, res) {
     res.sendFile(__dirname + '/public/authCode.html');
@@ -64,7 +67,8 @@ app.post('/verification', (req, res) => {
 });
 app.post('/register', (req, res) => {
     users[req.body.email] = { address: req.body.address, password: req.body.password }
-    res.redirect('/verify')
+    setFakeDB('fakeDB.json', users);
+    res.redirect('/verify');
 })
 app.post('/verify', (req, res) => { //for registration address verification
     if (req.body.code) {
@@ -102,4 +106,19 @@ async function sendWithAdamant(adamantAddress, code) {
 
     const command = `adm send message ${adamantAddress} "2FA code: ${code}"`;
     let { error, stdout, stderr } = await exec(command);
+}
+
+
+
+
+// handling json file (our fake DB)
+
+function getFakeDB(filepath) {
+    var file = fs.readFileSync(__dirname + '\\' + filepath, 'utf8');
+    return JSON.parse(file);
+}
+
+function setFakeDB(filepath, db) {
+    json = JSON.stringify(db);
+    fs.writeFile(__dirname + '\\' + filepath, json, 'utf8', (err) => {});
 }
