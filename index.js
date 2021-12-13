@@ -1,6 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
+const util = require('util');
+var speakeasy = require('speakeasy')
+
 var app = express();
 const port = 3000
 
@@ -8,9 +11,13 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//app logic and data
 var users = {};
+let counter = 0;
 
 
+//spatial address online situate consider slight powder network spoil moon ridge dutch
+//U16554575997295564327
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/public/registration.html');
@@ -27,6 +34,13 @@ app.get('/home', function(req, res) {
 
 app.post('/login', (req, res) => {
     if (req.body.email && users[req.body.email] && users[req.body.email].password == req.body.password) {
+        //setting the one time code
+        users[req.body.email]['code'] = speakeasy.hotp({
+            counter,
+            secret: users[req.body.email].password,
+        });
+        sendWithAdamant(users[req.body.adamantAddress], users[req.body.email]['code'])
+        counter++;
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/verification')
@@ -37,7 +51,12 @@ app.post('/login', (req, res) => {
     res.json({ success: false, status: 'Login Unsuccessful!' });
 })
 app.post('/verification', (req, res) => {
-    if (req.body.code) {
+    const verified = speakeasy.hotp.verify({
+        token: req.body.code,
+        secret: users[req.body.email].code,
+        counter: counter
+    })
+    if (verified) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/home')
@@ -76,4 +95,11 @@ app.listen(port, () => {
 
 function isAuthenticated(req, res, next) {
     return true;
+}
+
+async function sendWithAdamant(adamantAddress, code) {
+    const exec = util.promisify(require('child_process').exec);
+
+    const command = `adm send message ${adamantAddress} "2FA code: ${code}"`;
+    let { error, stdout, stderr } = await exec(command);
 }
