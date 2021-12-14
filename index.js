@@ -156,12 +156,11 @@ app.listen(port, () => {
 
 
 function isAuthenticated(req, res, next) {
-    // if (req.session.user === null) {     
-    //     var err = new Error('Not authorized! Go back!');
-    //     err.status = 401;
-    //     return next(err);
-    // } else 
-    {
+    if (req.session.email == null) {
+        var err = new Error('Not authorized! Go back!');
+        err.status = 401;
+        return next(err);
+    } else {
         return next();
     }
 }
