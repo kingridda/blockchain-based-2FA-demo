@@ -30,6 +30,7 @@ let counter = 0;
 //my adamant account
 //spatial address online situate consider slight powder network spoil moon ridge dutch
 //U16554575997295564327
+//getHash = function (trs) {return crypto.createHash('sha256').update(this.getBytes(trs)).digest()}
 
 app.get('/', function(req, res) {
     console.log(res.session)
@@ -44,6 +45,9 @@ app.get('/verify', function(req, res) { //registration adamant account verificat
 app.get('/home', isAuthenticated, function(req, res) {
     res.sendFile(__dirname + '/public/welcomePage.html');
 })
+app.get('/failed', (req, res) => {
+    res.sendFile(__dirname + '/public/failed.html');
+});
 
 app.post('/login', (req, res) => {
     if (req.body.email && users[req.body.email] && users[req.body.email].password &&
@@ -62,20 +66,26 @@ app.post('/login', (req, res) => {
     } else {
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json');
-        res.json({ success: false, status: 'Login Unsuccessful!' });
+        res.redirect('/failed')
     }
 })
 app.post('/register', (req, res) => {
     users[req.body.email] = { address: req.body.address, password: req.body.password }
     setFakeDB('fakeDB.json', users);
+    users[req.body.email]['counter'] = counter++;
+    users[req.body.email]['code'] = speakeasy.hotp({
+        counter: users[req.body.email]['counter'],
+        secret: users[req.body.email].password,
+    });
+    sendWithAdamant(users[req.body.adamantAddress], users[req.body.email]['code'])
     res.redirect('/verify');
 })
 app.post('/verification', (req, res) => {
     const verified = speakeasy.hotp.verify({
         token: req.body.code,
-        secret: users[req.body.email].code,
-        counter: users[req.body.email].counter,
-    })
+        secret: users[req.body.email].password,
+        counter: users[req.body.email]['counter'],
+    });
     if (verified) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -83,28 +93,38 @@ app.post('/verification', (req, res) => {
     } else {
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json');
-        res.json({ success: false, status: 'verification failed, login Unsuccessful!' });
+        res.redirect('/failed')
     }
 });
 
 app.post('/verify', (req, res) => { //for registration adamant address verification
-    if (req.body.code) {
+    const verified = speakeasy.hotp.verify({
+        token: req.body.code,
+        secret: users[req.body.email].password,
+        counter: users[req.body.email]['counter'],
+    });
+    if (verified) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/')
+    } else {
+        res.statusCode = 401;
+        res.setHeader('Content-Type', 'application/json');
+        res.redirect('/failed')
     }
 });
+
 
 
 
 //The 404 Route (ALWAYS Keep this as the last route)
 app.get('*', function(req, res) {
-    res.status(404).send('404');
+    res.status(404).sendFile(__dirname + '/public/failed.html');
 });
 // error handler
 app.use(function(err, req, res, next) {
     // render the error page
-    res.status(500).send('ERROR 500');
+    res.status(500).sendFile(__dirname + '/public/failed.html');
 });
 
 
@@ -128,7 +148,7 @@ function isAuthenticated(req, res, next) {
 async function sendWithAdamant(adamantAddress, code) {
     const exec = util.promisify(require('child_process').exec);
 
-    const command = `adm send message ${adamantAddress} "2FA code: ${code}"`;
+    const command = `node index.js send message ${adamantAddress} "2FA code: ${code}"`;
     let { error, stdout, stderr } = await exec(command);
 }
 
