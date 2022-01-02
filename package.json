@@ -1,19 +1,20 @@
 {
-  "name": "projet-ssi",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.19.1",
-    "express": "^4.17.1",
-    "express-session": "^1.17.2",
-    "nodemon": "^2.0.15",
-    "session-file-store": "^1.5.0",
-    "speakeasy": "^2.0.0"
-  }
+    "name": "projet-ssi",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.19.1",
+        "express": "^4.17.1",
+        "express-session": "^1.17.2",
+        "nodemon": "^2.0.15",
+        "session-file-store": "^1.5.0",
+        "speakeasy": "^2.0.0"
+    }
 }
