@@ -166,8 +166,10 @@ function isAuthenticated(req, res, next) {
 }
 
 async function sendWithAdamant(adamantAddress, code) {
+    console.log(code)
     const exec = util.promisify(require('child_process').exec);
-    const command = `node ../adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
+
+    const command = `node index.js send message ${adamantAddress} "2FA code: ${code}"`;
     let { error, stdout, stderr } = await exec(command);
 }
 
@@ -177,13 +179,13 @@ async function sendWithAdamant(adamantAddress, code) {
 // handling json file (our fake DB)
 
 function getFakeDB(filepath) {
-    var file = fs.readFileSync(__dirname + '/' + filepath, 'utf8');
+    var file = fs.readFileSync(__dirname + '\\' + filepath, 'utf8');
     return JSON.parse(file);
 }
 
 function setFakeDB(filepath, db) {
     json = JSON.stringify(db);
-    fs.writeFile(__dirname + '/' + filepath, json, 'utf8', (err) => {});
+    fs.writeFile(__dirname + '\\' + filepath, json, 'utf8', (err) => {});
 }
 
 function getHash(trs) {

@@ -16,13 +16,18 @@ RUN ln -s ~/adamant-console/index.js /usr/bin/adm #create symlink. make sure you
 
 RUN cp config.default.json config.json
 
-RUN sed 's/testnet/mainnet/' config.default.json > config.json
+# RUN sed 's/testnet/mainnet/' config.default.json > config.json
 
-RUN sed 's/"passPhrase":/"passPhrase": "web robust essay envelope scrub often salute afraid ethics ancient gown quick"/' config.json > config.default.json
+# RUN sed 's/"passPhrase":/"passPhrase": "web robust essay envelope scrub often salute afraid ethics ancient gown quick"/' config.json > config.default.json
+RUN cd /home
 
-COPY blockchain-based-2FA-demo /home/
+RUN git clone https://github.com/kingridda/blockchain-based-2FA-demo.git #fetching code from github
 
-RUN cd /home/blockchain-based-2FA-demo
+RUN cd blockchain-based-2FA-demo
+
+RUN npm install #installing dependencies
+
+RUN chmod a+x index.js #making executable
 
 RUN node index.js 
  
