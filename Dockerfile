@@ -16,7 +16,7 @@ RUN cd adamant-console && cp config.default.json config.json
 
 # meaningless command but util: change to repull git every time
 
-ARG CACHEBUST=8
+ARG CACHEBUST=10
 
 RUN cd adamant-console && sed 's/"network": "testnet"/"network": "mainnet"/' config.default.json > temp.json
 
