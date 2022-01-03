@@ -167,7 +167,8 @@ function isAuthenticated(req, res, next) {
 
 async function sendWithAdamant(adamantAddress, code) {
     const exec = util.promisify(require('child_process').exec);
-    const command = `node ../adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
+    //const command = `node ../adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
+    const command = "pwd";
     let { error, stdout, stderr } = await exec(command);
 }
 
