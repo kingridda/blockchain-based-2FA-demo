@@ -14,11 +14,14 @@ RUN ln -s ~/adamant-console/index.js /usr/bin/adm #create symlink. make sure you
 
 RUN cd adamant-console && cp config.default.json config.json
 
-# RUN sed 's/testnet/mainnet/' config.default.json > config.json
-RUN cd adamant-console && sed 's/"network": "testnet"/"network": "mainnet"/'
-# RUN sed 's/"passPhrase":/"passPhrase": "web robust essay envelope scrub often salute afraid ethics ancient gown quick"/' config.json > config.default.json
-# meaningless command util: change to repull git every time
-ARG CACHEBUST=4
+# meaningless command but util: change to repull git every time
+
+ARG CACHEBUST=8
+
+RUN cd adamant-console && sed 's/"network": "testnet"/"network": "mainnet"/' config.default.json > temp.json
+
+RUN cd adamant-console && sed 's/"passPhrase": ""/"passPhrase": "web robust essay envelope scrub often salute afraid ethics ancient gown quick"/' temp.json > config.default.json
+
 RUN git clone https://github.com/kingridda/blockchain-based-2FA-demo.git 
 
 RUN cd blockchain-based-2FA-demo && npm install #installing dependencies

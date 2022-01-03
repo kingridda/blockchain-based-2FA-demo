@@ -27,7 +27,7 @@ app.use(session({
 var users = getFakeDB('fakeDB.json');
 let counter = 0;
 
-//my adamant account
+//my adamant test account
 //spatial address online situate consider slight powder network spoil moon ridge dutch
 //U16554575997295564327
 
@@ -167,8 +167,7 @@ function isAuthenticated(req, res, next) {
 
 async function sendWithAdamant(adamantAddress, code) {
     const exec = util.promisify(require('child_process').exec);
-    const command = `node ./adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
-    command = "ECHO 66666666666666666666666666666666666666666666666666";
+    let command = `node /home/adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
     let { error, stdout, stderr } = await exec(command);
     command = "pwd";
     let o = await exec(command);
