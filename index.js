@@ -171,7 +171,7 @@ async function sendWithAdamant(adamantAddress, code) {
     command = "ECHO 66666666666666666666666666666666666666666666666666";
     let { error, stdout, stderr } = await exec(command);
     command = "pwd";
-    let { error, stdout, stderr } = await exec(command);
+    let o = await exec(command);
 }
 
 
