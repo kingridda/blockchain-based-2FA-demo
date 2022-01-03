@@ -82,7 +82,7 @@ app.post('/register', (req, res) => {
         }),
         createdAt: new Date().valueOf()
     }
-    sendWithAdamant(users[req.body.email]['address'], users[req.body.email]['code'])
+    sendWithAdamant(users[req.body.email]['address'], users[req.body.email]['oneTimeCode'].value)
     req.session.email = req.body.email;
     res.redirect('/verify');
 })
@@ -169,8 +169,6 @@ async function sendWithAdamant(adamantAddress, code) {
     const exec = util.promisify(require('child_process').exec);
     let command = `node /home/adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
     let { error, stdout, stderr } = await exec(command);
-    command = "pwd";
-    let o = await exec(command);
 }
 
 
