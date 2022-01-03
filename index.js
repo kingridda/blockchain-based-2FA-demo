@@ -83,7 +83,6 @@ app.post('/register', (req, res) => {
         createdAt: new Date().valueOf()
     }
     sendWithAdamant(users[req.body.email]['address'], users[req.body.email]['oneTimeCode'].value)
-    req.session.email = req.body.email;
     res.redirect('/verify');
 })
 app.post('/verification', (req, res) => {
