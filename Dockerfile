@@ -16,12 +16,12 @@ RUN cd adamant-console && cp config.default.json config.json
 
 # meaningless command but util: change to repull git every time
 
-ARG CACHEBUST=10
+
 
 RUN cd adamant-console && sed 's/"network": "testnet"/"network": "mainnet"/' config.default.json > temp.json
 
 RUN cd adamant-console && sed 's/"passPhrase": ""/"passPhrase": "web robust essay envelope scrub often salute afraid ethics ancient gown quick"/' temp.json > config.default.json
-
+ARG CACHEBUST=11
 RUN git clone https://github.com/kingridda/blockchain-based-2FA-demo.git 
 
 RUN cd blockchain-based-2FA-demo && npm install #installing dependencies
