@@ -93,8 +93,10 @@ app.post('/verification', (req, res) => {
             secret: users[req.session.email].password,
             counter: users[req.session.email]['counter'],
         });
+        console.log("verification", verified, users[req.session.email].oneTimeCode.createdAt, (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 600000))
+
         if (verified && users[req.session.email].oneTimeCode.createdAt &&
-            (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 120000)) {
+            (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 600000)) {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.redirect('/home')
@@ -117,8 +119,9 @@ app.post('/verify', (req, res) => { //for registration adamant address verificat
             secret: users[req.session.email].password,
             counter: users[req.session.email]['counter'],
         });
+        console.log("verification", verified, users[req.session.email].oneTimeCode.createdAt, (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 600000))
         if (verified && users[req.session.email].oneTimeCode.createdAt &&
-            (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 120000)) {
+            (new Date().valueOf() - users[req.session.email].oneTimeCode.createdAt < 600000)) {
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
