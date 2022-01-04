@@ -176,6 +176,7 @@ async function sendWithAdamant(adamantAddress, code) {
             return;
         }
         console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
     });
 }
 
