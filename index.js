@@ -4,6 +4,7 @@ var session = require('express-session')
 var FileStore = require('session-file-store')(session);
 var path = require('path');
 const util = require('util');
+const exec = require("child_process");
 var speakeasy = require('speakeasy')
 var fs = require("fs");
 var crypto = require('crypto');
@@ -166,9 +167,14 @@ function isAuthenticated(req, res, next) {
 }
 
 async function sendWithAdamant(adamantAddress, code) {
-    const exec = util.promisify(require('child_process').exec);
+    //const exec = util.promisify(exec);
     let command = `node /home/adamant-console/index.js send message ${adamantAddress} "2FA code: ${code}"`;
-    let { error, stdout, stderr } = await exec(command);
+    exec(command, (err, stdout, stderr) => {
+        if (err) {
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+    });
 }
 
 
